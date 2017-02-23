@@ -1,0 +1,9 @@
+---
+applications:
+- name: getwwn
+  buildpack: nodejs_buildpack
+  memory: 64MB
+  disk-quota: 20MB
+  host: getwwn
+  domain: bellevuelab.isus.emc.com
+  command: node app.js
