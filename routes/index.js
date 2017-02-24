@@ -1,7 +1,9 @@
 // routes/index.js
 
-const vmaxRoutes = require('./vmax_routes');
+var vmaxRoutes = require('./vmax_routes');
+var xtremioRoutes = require('./xtremio_routes');
 
 module.exports = function(app) {
   vmaxRoutes(app);
+  xtremioRoutes(app);
 };

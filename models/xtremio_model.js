@@ -2,12 +2,21 @@
 
 module.exports = {
 
-  calculateWnnAndWwpn: function(xtremIOPsnt) {
-    var wwnn=calculateWwnn(xtremIOPsnt);
-    $("#xtremIOWWNN").val(wwnn);//set wwnn value to be displayed in ui
-    var brickNum = xtremIOVars.xtremIONumofBricks.val();
-    var displayList =  calculateXtremIOWwpns(xtremIOPsnt ,brickNum );//call function to calculate wwpns
-    displayXtremIOWwpns(displayList);//call function to display wwpns
+  calculateWnnAndWwpn: function(xtremIOPsnt, brickNum) {
+    var wwnn=this.calculateWwnn(xtremIOPsnt);
+    var displayList =  this.calculateXtremIOWwpns(xtremIOPsnt ,brickNum );//call function to calculate wwpns
+    return {
+      wwns: displayList,
+      wwnn: wwnn
+    };//call function to display wwpns
+  },
+
+  loopZero: function(obj, limit) {
+    var c = '0';
+    while (obj.length < limit){
+      obj = c + obj;
+    }
+    return obj;
   },
 
   calculateXtremIOWwpns: function(xtremIOPsnt , numOfBricks) {
@@ -25,53 +34,36 @@ module.exports = {
       num_Bricks=numOfBricks;
     }
     var d=0;
+    var section1 = "5";
+    var section2 = "14F0C5";
     for(var brick=0; brick < num_Bricks ;brick++){
       for(var sc=0; sc < 2 ; sc ++){
         for(var port=0; port < 2 ; port++){
-          var wwpn_bit=wwpn+loopZero(parseInt(brick).toString(2),4)+loopZero(parseInt(sc).toString(2),2)+loopZero(parseInt(port).toString(2),2);
-          var wwpn_hex=section1+section2+loopZero(parseInt(wwpn_bit,2).toString(16),9);
+          var wwpn_bit=wwpn+this.loopZero(parseInt(brick).toString(2),4)+this.loopZero(parseInt(sc).toString(2),2)+this.loopZero(parseInt(port).toString(2),2);
+          var wwpn_hex=section1+section2+this.loopZero(parseInt(wwpn_bit,2).toString(16),9);
           var iqn='iqn.2008-05.com.xtremio:'+serialNum+'-'+wwpn_hex;
           var wwpn_colon=wwpn_hex.toUpperCase().chunk(2).join(":");
-          xtremIODisplayListAll[d++] = new Array(model, serialNum, brick+1, sc+1,port+1 ,wwpn_colon, wwpn_hex, iqn);
+          xtremIODisplayListAll[d++] = {"model": model, "serialNum": serialNum, "brick": brick+1, "controller": sc+1,"port": port+1 ,"wwpn_colon": wwpn_colon, "wwpn": wwpn_hex, "iqn": iqn};
         }
       }
     }
     return xtremIODisplayListAll;
   },
 
-  displayXtremIOWwpns: function(displayList) {
-    try {
-      resultTable.fnClearTable();
-      resultTable.fnAddData(displayList);
-      var resultDiv = $('#xtremIO-result');
-      if (!resultDiv.is(':visible')) {
-        resultDiv.show();
-        resultDiv.addClass('showing');
-        $('#xtremIOTable').wrap('<div id="xtremIO-scroll" class="scroll-wrap"></div>');
-        $('#xtremIO-scroll').before('<div class="clearfix"></div>');
-      }
-      exporter.setContext('#xtremIo');
-      $('#export-results-button').removeClass('disabled');
-    } catch (e) {
-      console.error(e);
-    }
-  },
-
-  //function which calculates wwnn 
   calculateWwnn: function(xtremIoPsnt) {
     var psnt = xtremIoPsnt;
     var serialNumber = psnt.slice(9);//get the serial number from psnt
     serialNumber_Bin = parseInt(serialNumber).toString(2);//Changes to binary number string
     var section3_Bin = serialNumber_Bin;
-    section3_Bin = loopZero(section3_Bin, 17);
+    section3_Bin = this.loopZero(section3_Bin, 17);
     var week = psnt.substr(7,2);//get the week of manufactured
     week_Bin = parseInt(week).toString(2);//Changes to binary number string from psnt
-    week_Bin=loopZero(week_Bin, 6);
+    week_Bin=this.loopZero(week_Bin, 6);
     section3_Bin=section3_Bin+week_Bin;
     var year=psnt.substr(5,2);//get year of manufactured from psnt
     var offset=year-12;//calculate offset of year 
     offset_Bin=parseInt(offset).toString(2);
-    offset_Bin=loopZero(offset_Bin, 5);
+    offset_Bin=this.loopZero(offset_Bin, 5);
     section3_Bin=section3_Bin+offset_Bin;
     var manufacturer=psnt.substr(0,3);//get the manufacturer
     if(manufacturer.toLowerCase()=='ckm'){
@@ -87,10 +79,12 @@ module.exports = {
     } else {
       manufacturer_bin='111';
     }
+    var section1 = "5";
+    var section2 = "14F0C5";
     section3_Bin=section3_Bin+manufacturer_bin+'00000';//for sub section 5 reserved - default 00000
     var section3_hex=parseInt(section3_Bin,2).toString(16);
     if(section3_hex.length < 9){
-      section3_hex=loopZero(section3_hex, 9);
+      section3_hex=this.loopZero(section3_hex, 9);
     }
     var xtremIO_WWNN=section1+section2+section3_hex;//combine all the three sections and get final wwnn 
     xtremIO_WWNN=xtremIO_WWNN.toUpperCase().chunk(2).join(":");
@@ -109,7 +103,6 @@ module.exports = {
       return false;
     }
     //Error message may or may not be visible, but hide it as a matter of course.
-    notifier.hideMessage();
     return true;
   },
 
@@ -134,19 +127,18 @@ module.exports = {
       return false;
     }
     //Error message may or may not be visible, but hide it as a matter of course.
-    notifier.hideMessage();
     return true;
   },
 
-  function test(psnt) {
+  test: function(psnt) {
     if (psnt.length == 14) {
-      return validateSerialNumber(psnt);
+      return this.validateSerialNumber(psnt);
     }
   },
 
-  function testBrickNumber(brickNumber) {
+  testBrickNumber: function(brickNumber) {
     if (brickNumber !='' &&  brickNumber.length <= 2) {
-      return validateBrickNumber(brickNumber);
+      return this.validateBrickNumber(brickNumber);
     }else {
       return true;
     }
