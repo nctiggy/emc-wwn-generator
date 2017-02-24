@@ -33,8 +33,7 @@ http://localhost:3000/symmetrix/{serialnumber without leading letters}
                 "wwpnColon": "50:00:09:73:00:09:C9:01",
                 "wwpn": "500009730009C901",
                 "iqn": "iqn.1992-04.com.emc.500009730009C901"
-            },
-            {...}
+            }
 }
 ```
 
