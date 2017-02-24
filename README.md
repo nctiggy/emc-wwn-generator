@@ -8,6 +8,10 @@ npm install
 ####Run:
 ```shell
 node app.js
+
+--or--
+
+cf push #If you are using CF
 ```
 
 ####Use:
