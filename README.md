@@ -22,7 +22,7 @@ http://localhost:3000/symmetrix/{serialnumber without leading letters}
 Not a ton of error checking sorry.
 
 ####TODO:
-*XtremIO
-*VPLEX
-*VNX
-*Data Domain
+* XtremIO
+* VPLEX
+* VNX
+* Data Domain
