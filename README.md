@@ -17,6 +17,7 @@ cf push #If you are using CF
 ####Use:
 
 http://localhost:3000/symmetrix/{serialnumber without leading letters}
+
 http://localhost:3000/xtremio/{serialnumber without leading letters}/{number of xbricks}
 
 ####Example VMAX Output:
